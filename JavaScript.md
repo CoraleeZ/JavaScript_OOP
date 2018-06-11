@@ -247,3 +247,244 @@ function Person(name, age) {
 var joe = new Person("Joe", 23);
 joe.greet();
 ``` 
+
+
+
+BREAK NEED TO GO BACK AND FILL IN 
+
+
+## ES6 Classes
+
+Introduction
+With the introduction of ES6, JavaScript developers now have access to the Class keyword. However, don't be fooled: ES6's Classes are just syntactic wrappers around the Object Constructors we've already learned. Under the hood, Classes and Object Constructors largely behave the same way. The benefit we get is easier syntax to read and write, which we call syntactic sugar.
+
+Class and constructor
+Let's define a simple class: Dot. Dots have an x value and a y value. Consider the below definition:
+
+```javascript
+class Dot {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+```
+
+We're defining our class using the class keyword. In addition, we're defining a method called constructor. All ES6 classes have a constructor, and the constructor always runs whenever we create a new instance. Try running this next example:
+
+```javascript
+class Dot {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        console.log("You created a Dot!");
+    }
+}
+const dot1 = new Dot(10, 10);
+```
+
+That console log fired when we invoked the new keyword. Also take note: Classes are NOT hoisted. No matter what, the class keyword will stay where it was written and not move during interpretation.
+
+ES6 vs ES5
+
+```javascript
+// ES5 way
+function Dot(x, y) {
+    this.x = x;
+    this.y = y;
+}
+Dot.prototype.showLocation = function() {
+    console.log("This Dot is at x " + this.x + " and y " + this.y);
+}
+var dot1 = new Dot(55, 20);
+dot1.showLocation();
+// ES6 way
+class Dot {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    showLocation() {
+        // ES6 String Interpolation! Note that the string is enclosed in backticks, not quotes.
+        console.log(`This Dot is at x ${this.x} and y ${this.y}`);
+    }
+}
+const dot2 = new Dot(5, 13);
+dot2.showLocation();
+```
+
+It should be emphasized that the two above examples are doing the exact same thing. The key difference is syntax. Also take note, adding methods to ES6 classes is the same as adding prototype methods to object constructors. These get added to the prototype chain in the same way.
+
+Class Methods vs Instance Methods
+In ES6, class methods are called 'static methods' while instance methods are called 'prototype methods'. We've already seen prototype methods, now let's look at a static method. Let's say we want to add a new function to the class Dot, not an instance of a Dot:
+
+```javascript
+class Dot {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    // prototype method
+    showLocation() {
+        console.log(`This Dot is at x ${this.x} and y ${this.y}`);
+    }
+    // static method
+    static getHelp() {
+        console.log("This is a Dot class, for created Dots! A Dot takes x and y coordinates, type 'new Dot' to create one!");
+    }
+} 
+const dot3 = new Dot(4, 2);
+// we can see showLocation from our instance...
+console.log(dot3.showLocation);
+// but we can't see getHelp
+console.log(dot3.getHelp);
+// however we can call getHelp this way:
+Dot.getHelp();
+```
+
+## Inheritance and Super
+
+Inheritance is much easier with the ES6 class syntax. Using the extends keyword, we can define new classes that inherit from existing classes. Inheritance is a common aspect of OOP, and it's important to see how JavaScript does it a little differently. Let's see inheritance in action:
+
+```javascript
+// parent Dot class
+class Dot {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    showLocation() {
+        console.log(`This Dot is at x ${this.x} and y ${this.y}`);
+    }
+}
+// child Circle class
+class Circle extends Dot {
+    constructor(x, y, radius) {
+        super(x, y);
+        this.radius = radius;
+    }
+}
+// we can now create Circles
+const circle1 = new Circle(33, 33, 33);
+// same attributes as a Dot, plus a radius
+console.log(circle1);
+// and Circles can access Dot methods
+circle1.showLocation();
+```
+
+If you look closely, you will notice the super() function. Super is a special function that allows us to call the constructor of the parent class. Just like how Dot needs an x and y value, the super() of our Circle class requires that exact same thing.
+
+### Methods
+
+If you run the previous example, you'll notice that showLocation() is actually specific for the Dot class. It even names the Dot class in the string! Let's rewrite it further:
+
+```javascript
+// parent Dot class
+class Dot {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    showLocation() {
+        console.log(`This ${ this.constructor.name } is at x ${this.x} and y ${this.y}`);
+    }
+}
+// child Circle class
+class Circle extends Dot {
+    constructor(x, y, radius) {
+        super(x, y);
+        this.radius = radius;
+    }
+}
+```
+
+Now our Circle class provides the correct message. When calling showLocation(), first the Circle class will look at itself to see if it has that method. If not, it will work its way up the prototype chain to look for it.
+
+Super Continued
+Another important property of super is we can call Parent methods with it. Consider this example:
+
+```javascript
+// parent Dot class
+class Dot {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    showLocation() {
+        console.log(`This ${ this.constructor.name } is at x ${ this.x } and y ${ this.y }`);
+    }
+    // simple method in the parent class
+    parentFunction(){
+        return "This is coming from the parent!";
+    }
+}
+// child Circle class
+class Circle extends Dot {
+    constructor(x, y, radius) {
+        super(x, y);
+        this.radius = radius;
+    }
+    // simple function in the child class
+    childFunction() {
+        // by using super, we can call the parent method
+        const message = super.parentFunction();
+        console.log(message);
+    }
+}
+const circle = new Circle(1, 2, 3);
+circle.childFunction();
+```
+
+Much like how we use super() to call the parent constructor, super can also be used to call other methods from the parent!
+
+## Getter and Setters
+
+A common way to read and update attributes within our objects is to use Getters and Setters. While we can recreate this technique in many situations, JavaScript supports Getters and Setters syntactically. Again, these serve to make our JS easier and quicker to read and write. Getters get a specific attribute. Setters set the value of a specific attribute.
+
+```javascript
+class Pizza {
+    constructor(radius, slices) {
+        this.radius = radius;
+        this._slices = slices;
+    }
+    get slices () { 
+        return this._slices; 
+    }
+    set slices (slices) { 
+        this._slices = slices;
+    }
+};
+```
+
+In this example, we named the _slices attribute with an underscore as the first character. This way, the desired variable slices can be used in this way:
+
+```javascript
+const pie = new Pizza(12, 6);
+console.log(pie.slices);     // we use the getter to determine how many slices we have
+pie.slices = 12;             // the setter will change the number of slices
+console.log(pie.slices);     // use the getter again to make sure our slices have doubled
+```
+
+If we did not differentiate the attribute name from the getter and setter names, the above code would have put us into an infinite loop, and we would have gotten a RangeError: Maximum call stack size exceeded. It does not matter how you differentiate the names of the attributes from the Getters and Setters, but preceding the attribute with an underscore is convention.
+
+Custom Getters
+Using these same patterns, we can create custom Getters. Consider the following snippet:
+
+```javascript
+class Circle{
+    constructor(x, y, radius) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+    }
+    get diameter() {
+        return this.radius * 2;
+    }
+}
+const circle1 = new Circle(1, 2, 5);
+console.log(circle1.diameter);
+```
+
+Now our Circles have a diameter attribute even though we didn't explicitly add it to the constructor.
+
+
